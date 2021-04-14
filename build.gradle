@@ -36,6 +36,10 @@ dependencies {
   api group: 'org.swimos', name: 'swim-api', version:version
   implementation group: 'org.swimos', name: 'swim-server', version: version
   implementation group: 'org.swimos', name: 'swim-client', version: version
+
+  // https://mvnrepository.com/artifact/com.azure/azure-messaging-eventhubs
+  implementation group: 'com.azure', name: 'azure-messaging-eventhubs', version: '5.6.0'
+
 }
 
 afterEvaluate {

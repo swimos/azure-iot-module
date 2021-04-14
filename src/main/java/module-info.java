@@ -16,6 +16,7 @@ open module swim.iot {
   requires transitive swim.api;
   requires swim.server;
   requires swim.client;
+  requires com.azure.messaging.eventhubs;
 
   exports swim.iot;
   provides swim.api.plane.Plane with swim.iot.SwimPlane;

@@ -6,6 +6,9 @@ import swim.api.agent.AbstractAgent;
 import swim.api.lane.MapLane;
 import swim.api.lane.ValueLane;
 import swim.concurrent.TimerRef;
+import swim.iot.azure.SendToEventHub;
+import swim.iot.util.EnvConfig;
+import swim.recon.Recon;
 import swim.structure.Record;
 
 public class SimulationAgent extends AbstractAgent {
@@ -19,6 +22,11 @@ public class SimulationAgent extends AbstractAgent {
    * Set Timer for generate random data every 15 seconds
    */
   TimerRef dataTimer;
+
+  /**
+   * Set Timer for send to Azure Event Hub
+   */
+  TimerRef eventHubTimer;
 
   /**
    * Swim ValueLane stores latest cpu Usage, with Object type Double
@@ -79,10 +87,12 @@ public class SimulationAgent extends AbstractAgent {
   }
 
   private void updateSimulation() {
-    double cpuUsage = Math.round(Math.random() * 100 * 10.0) / 10.0;
-    double memUsage = Math.round(Math.random() * 100 * 10.0) / 10.0;
-    double cpuPercent_value = cpuUsage / cpuTotal.get() * 100;
-    double memPercent_value = memUsage / memTotal.get() * 100;
+    // fixme: cpuPercentHistory = { tm: 1618421867720; cpuPercent: 59.599999999999994}
+    // met incorrect number of decimal in some case
+    double cpuUsage = (int) Math.round(Math.random() * 100 * 10.0) / 10.0;
+    double memUsage = (int) Math.round(Math.random() * 100 * 10.0) / 10.0;
+    double cpuPercent_value = cpuUsage / (double) cpuTotal.get() * 100;
+    double memPercent_value = memUsage / (double) memTotal.get() * 100;
 
     cpuPercent.set(cpuPercent_value);
     memPercent.set(memPercent_value);
@@ -94,9 +104,22 @@ public class SimulationAgent extends AbstractAgent {
     dataTimer();
   }
 
+  /**
+   * Generate Event Timer to send data to Event Hub every 30 secs
+   */
+  private void eventHubTimer() {
+    eventHubTimer = setTimer(30000, this::sendToEventHub);
+  }
+
+  private void sendToEventHub() {
+    SendToEventHub.publishEvents(Recon.toString(dataGenerator()));
+    info("send to event hub");
+    eventHubTimer();
+  }
+
   private Record dataGenerator() {
     Record record = Record.create(3)
-        .slot("edgeDeviceHost", "localDevice")// ConfigEnv.EDGE_NAME)
+        .slot("edgeDeviceName", EnvConfig.EDGE_NAME)
         .slot("cpuPct", cpuPercent.get())
         .slot("memPct", memPercent.get());
     return record;
@@ -108,6 +131,10 @@ public class SimulationAgent extends AbstractAgent {
       dataTimer.cancel();
       dataTimer = null;
     }
+    if (eventHubTimer != null) {
+      eventHubTimer.cancel();
+      eventHubTimer = null;
+    }
   }
 
   @Override
@@ -118,5 +145,8 @@ public class SimulationAgent extends AbstractAgent {
     cpuTotal.set(100L);
     memTotal.set(100L);
     dataTimer();
+    if (!EnvConfig.EVENT_HUB_CONNSTRING.isEmpty() && !EnvConfig.EVENT_HUB_NAME.isEmpty()) {
+      eventHubTimer();
+    }
   }
 }
