@@ -1,0 +1,29 @@
+@kernel(class: 'swim.store.db.DbStoreKernel', optional: true)
+@kernel(class: 'swim.reflect.ReflectKernel', optional: true)
+
+iot: @fabric {
+  @plane(class: "swim.iot.SwimPlane")
+
+  @node {
+    pattern: "/simulation"
+    @agent(class: "swim.iot.agent.SimulationAgent")
+  }
+
+  #@node {
+  #  pattern: "/adls"
+  #  @agent(class: "swim.iot.agent.ADLSAgent")
+  #}
+
+  @store {
+    path: "/tmp/swim-azure-iot-module/"
+  }
+}
+
+@web(port: 9005) {
+  space: "traffic"
+  #documentRoot: "../ui/"
+  @websocket {
+    serverCompressionLevel: 0# -1 = default; 0 = off; 1-9 = deflate level
+    clientCompressionLevel: 0# -1 = default; 0 = off; 1-9 = deflate level
+  }
+}
