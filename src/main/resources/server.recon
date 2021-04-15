@@ -9,10 +9,10 @@ iot: @fabric {
     @agent(class: "swim.iot.agent.SimulationAgent")
   }
 
-  #@node {
-  #  pattern: "/adls"
-  #  @agent(class: "swim.iot.agent.ADLSAgent")
-  #}
+  @node {
+    pattern: "/adls"
+    @agent(class: "swim.iot.agent.AdlsAgent")
+  }
 
   @store {
     path: "/tmp/swim-azure-iot-module/"

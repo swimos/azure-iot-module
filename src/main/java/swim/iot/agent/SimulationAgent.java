@@ -24,7 +24,7 @@ public class SimulationAgent extends AbstractAgent {
   TimerRef dataTimer;
 
   /**
-   * Set Timer for send to Azure Event Hub
+   * Set Timer to send to Azure Event Hub
    */
   TimerRef eventHubTimer;
 
@@ -89,8 +89,8 @@ public class SimulationAgent extends AbstractAgent {
   private void updateSimulation() {
     // fixme: cpuPercentHistory = { tm: 1618421867720; cpuPercent: 59.599999999999994}
     // met incorrect number of decimal in some case
-    double cpuUsage = (int) Math.round(Math.random() * 100 * 10.0) / 10.0;
-    double memUsage = (int) Math.round(Math.random() * 100 * 10.0) / 10.0;
+    double cpuUsage = Math.round(Math.random() * 100 * 10.0) / 10.0;
+    double memUsage = Math.round(Math.random() * 100 * 10.0) / 10.0;
     double cpuPercent_value = cpuUsage / (double) cpuTotal.get() * 100;
     double memPercent_value = memUsage / (double) memTotal.get() * 100;
 
@@ -102,6 +102,9 @@ public class SimulationAgent extends AbstractAgent {
     memPercentHistory.put(tm, memPercent_value);
 
     dataTimer();
+    if (!EnvConfig.ADLS_ACCOUNT_NAME.isEmpty() && !EnvConfig.ADLS_ACCOUNT_KEY.isEmpty()) {
+      command("/adls", ADLS_Lane, dataGenerator());
+    }
   }
 
   /**
@@ -149,4 +152,6 @@ public class SimulationAgent extends AbstractAgent {
       eventHubTimer();
     }
   }
+
+  private static final String ADLS_Lane = "addData";
 }

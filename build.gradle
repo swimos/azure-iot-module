@@ -39,6 +39,8 @@ dependencies {
 
   // https://mvnrepository.com/artifact/com.azure/azure-messaging-eventhubs
   implementation group: 'com.azure', name: 'azure-messaging-eventhubs', version: '5.6.0'
+  // https://search.maven.org/artifact/com.azure/azure-storage-file-datalake
+  implementation group: 'com.azure', name: 'azure-storage-file-datalake', version: '12.4.1'
 
 }
 
