@@ -17,7 +17,10 @@ open module swim.iot {
   requires swim.server;
   requires swim.client;
   requires com.azure.messaging.eventhubs;
-  requires com.azure.storage.file.datalake;
+  requires org.apache.httpcomponents.httpasyncclient;
+  requires org.apache.httpcomponents.httpclient;
+  requires org.apache.httpcomponents.httpcore;
+  requires org.apache.httpcomponents.httpcore.nio;
 
   exports swim.iot;
   provides swim.api.plane.Plane with swim.iot.SwimPlane;

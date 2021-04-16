@@ -1,5 +1,6 @@
 package swim.iot.agent;
 
+import java.text.DecimalFormat;
 import swim.api.SwimLane;
 import swim.api.SwimTransient;
 import swim.api.agent.AbstractAgent;
@@ -41,7 +42,7 @@ public class SimulationAgent extends AbstractAgent {
   @SwimLane("cpuPercentHistory")
   MapLane<Long, Double> cpuPercentHistory = this.<Long, Double>mapLane()
       .didUpdate((k, n, o) -> {
-        info("cpuPercentHistory = { tm: " + k + "; cpuPercent: " + n + "}");
+//        info("cpuPercentHistory = { tm: " + k + "; cpuPercent: " + n + "}");
         if (this.cpuPercentHistory.size() > MAX_HISTORY_SIZE) {
           for (int i = 0; i < this.cpuPercentHistory.size() - MAX_HISTORY_SIZE; i++) {
             this.cpuPercentHistory.remove(this.cpuPercentHistory.getIndex(i).getKey());
@@ -68,7 +69,7 @@ public class SimulationAgent extends AbstractAgent {
   @SwimLane("memPercentHistory")
   MapLane<Long, Double> memPercentHistory = this.<Long, Double>mapLane()
       .didUpdate((k, n, o) -> {
-        info("memPercentHistory = { tm: " + k + "; memPercent: " + n + "}");
+//        info("memPercentHistory = { tm: " + k + "; memPercent: " + n + "}");
         if (this.memPercentHistory.size() > MAX_HISTORY_SIZE) {
           for (int i = 0; i < this.memPercentHistory.size() - MAX_HISTORY_SIZE; i++) {
             this.memPercentHistory.remove(this.memPercentHistory.getIndex(i).getKey());
@@ -87,10 +88,11 @@ public class SimulationAgent extends AbstractAgent {
   }
 
   private void updateSimulation() {
-    // fixme: cpuPercentHistory = { tm: 1618421867720; cpuPercent: 59.599999999999994}
-    // met incorrect number of decimal in some case
-    double cpuUsage = Math.round(Math.random() * 100 * 10.0) / 10.0;
-    double memUsage = Math.round(Math.random() * 100 * 10.0) / 10.0;
+    DecimalFormat df = new DecimalFormat("#.#");
+    double cpuUsage_random = Math.round(Math.random() * 100);
+    double cpuUsage = Double.parseDouble(df.format(cpuUsage_random));
+    double memUsage_random = Math.round(Math.random() * 100);
+    double memUsage = Double.parseDouble(df.format(memUsage_random));
     double cpuPercent_value = cpuUsage / (double) cpuTotal.get() * 100;
     double memPercent_value = memUsage / (double) memTotal.get() * 100;
 
@@ -122,7 +124,7 @@ public class SimulationAgent extends AbstractAgent {
 
   private Record dataGenerator() {
     Record record = Record.create(3)
-        .slot("edgeDeviceName", EnvConfig.EDGE_NAME)
+        .slot("edgeDeviceName", EnvConfig.EDGE_DEVICE_NAME)
         .slot("cpuPct", cpuPercent.get())
         .slot("memPct", memPercent.get());
     return record;

@@ -11,14 +11,14 @@ public class EnvConfig {
   /**
    * Configuration environment variable for device name
    */
-  public static final String EDGE_NAME = envCorrection(System.getenv("EDGE_NAME"), "");
+  public static final String EDGE_DEVICE_NAME = envCorrection(System.getenv("EDGE_NAME"), "localSimulator");
 
   /**
    * Configuration environment variables for ADLS Gen2
    */
   public static final String ADLS_ACCOUNT_NAME = envCorrection(System.getenv("ADLS_ACCOUNT_NAME"), "");
   public static final String ADLS_ACCOUNT_KEY = envCorrection(System.getenv("ADLS_ACCOUNT_KEY"), "");
-  public static final String FILE_SYSTEM = envCorrection(System.getenv("FILE_SYSTEM"), "test-system");
+  public static final String FILE_SYSTEM = envCorrection(System.getenv("FILE_SYSTEM"), "");
 
   /**
    * Helper function that standards parsing environment variables

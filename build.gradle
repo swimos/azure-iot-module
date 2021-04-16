@@ -29,7 +29,6 @@ def useModules = jvmVersion >= 9 && !project.hasProperty('no-modules')
 repositories {
   mavenCentral()
   maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-  maven { url 'https://packages.confluent.io/maven/' }
 }
 
 dependencies {
@@ -39,9 +38,8 @@ dependencies {
 
   // https://mvnrepository.com/artifact/com.azure/azure-messaging-eventhubs
   implementation group: 'com.azure', name: 'azure-messaging-eventhubs', version: '5.6.0'
-  // https://search.maven.org/artifact/com.azure/azure-storage-file-datalake
-  implementation group: 'com.azure', name: 'azure-storage-file-datalake', version: '12.4.1'
-
+  compile group: 'org.apache.httpcomponents', name: 'httpasyncclient', version: '4.1.4'
+  compile group: 'org.apache.httpcomponents', name: 'httpcore-nio', version: '4.4.14'
 }
 
 afterEvaluate {
