@@ -2,9 +2,6 @@
 
 FROM openjdk:11-jdk-stretch
 
-# other choice
-#FROM openjdk:11-ea-19-jdk-slim
-
 WORKDIR /
 
 EXPOSE 9005
