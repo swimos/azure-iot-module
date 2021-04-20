@@ -5,12 +5,12 @@ iot: @fabric {
   @plane(class: "swim.iot.SwimPlane")
 
   @node {
-    pattern: "/simulation"
+    uri: "/simulation"
     @agent(class: "swim.iot.agent.SimulationAgent")
   }
 
   @node {
-    pattern: "/adls"
+    pattern: "/adls/:id"
     @agent(class: "swim.iot.agent.AdlsAgent")
   }
 

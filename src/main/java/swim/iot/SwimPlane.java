@@ -4,7 +4,6 @@ import swim.api.plane.AbstractPlane;
 import swim.api.space.Space;
 import swim.kernel.Kernel;
 import swim.server.ServerLoader;
-import swim.structure.Value;
 
 public class SwimPlane extends AbstractPlane {
 
@@ -15,7 +14,13 @@ public class SwimPlane extends AbstractPlane {
     kernel.start();
     System.out.println("Running Swim Azure IoT Module SwimPlane...");
 
-    space.command("/simulation", "WAKUP", Value.absent());
+    System.out.println(System.getenv("EVENT_HUB_CONNSTRING"));
+    System.out.println(System.getenv("EVENT_HUB_NAME"));
+    System.out.println(System.getenv("EDGE_NAME"));
+    System.out.println(System.getenv("ADLS_ACCOUNT_NAME"));
+    System.out.println(System.getenv("ADLS_ACCOUNT_KEY"));
+    System.out.println(System.getenv("FILE_SYSTEM"));
+
     kernel.run();
   }
 

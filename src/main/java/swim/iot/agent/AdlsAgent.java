@@ -287,9 +287,11 @@ public class AdlsAgent extends AbstractAgent {
     info(Record.create(2)
         .slot("nodeUri", nodeUri().toString())
         .slot("didStart"));
-    restClient = new RestClient(EnvConfig.ADLS_ACCOUNT_NAME, EnvConfig.ADLS_ACCOUNT_KEY);
-    initClient();
-    adlsTimer();
+    if (!EnvConfig.ADLS_ACCOUNT_NAME.isEmpty() && !EnvConfig.ADLS_ACCOUNT_KEY.isEmpty() && !EnvConfig.FILE_SYSTEM.isEmpty()) {
+      restClient = new RestClient(EnvConfig.ADLS_ACCOUNT_NAME, EnvConfig.ADLS_ACCOUNT_KEY);
+      initClient();
+      adlsTimer();
+    }
   }
 
 }

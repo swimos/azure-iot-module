@@ -105,7 +105,7 @@ public class SimulationAgent extends AbstractAgent {
 
     dataTimer();
     if (!EnvConfig.ADLS_ACCOUNT_NAME.isEmpty() && !EnvConfig.ADLS_ACCOUNT_KEY.isEmpty()) {
-      command("/adls", ADLS_Lane, dataGenerator());
+      command("/adls" + "/" + EnvConfig.ADLS_ACCOUNT_NAME, ADLS_Lane, dataGenerator());
     }
   }
 
