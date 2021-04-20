@@ -5,10 +5,14 @@ import swim.api.space.Space;
 import swim.kernel.Kernel;
 import swim.server.ServerLoader;
 
+/**
+ * Swim Plane starts kernel and space to run Swim Agents
+ */
 public class SwimPlane extends AbstractPlane {
 
   public static void main(String[] args) {
     final Kernel kernel = ServerLoader.loadServer();
+    /* Space name needs to match with fabric naming in server.recon*/
     final Space space = kernel.getSpace("iot");
 
     kernel.start();

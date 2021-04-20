@@ -19,8 +19,15 @@ import swim.structure.Record;
 import swim.structure.Value;
 import swim.util.OrderedMap;
 
+/**
+ * AdlsAgent, a Swim Web Agent, receives data from SimulationAgent, then generate file structure
+ * send data to ADLS Gen2 by using REST API
+ */
 public class AdlsAgent extends AbstractAgent {
 
+  /**
+   * ADLS Gen2 Path Set Up matches with ADLS Gen2 Setup
+   */
   private String FILE_PATH_NAME = EnvConfig.EDGE_DEVICE_NAME;
   private Boolean initFlag = true;
 
@@ -43,12 +50,18 @@ public class AdlsAgent extends AbstractAgent {
   }
 
   /**
-   * Fixed MAX History MapLane Size
+   * MAX History MapLane dataHistory's Size
    */
   private final int MAX_HISTORY_SIZE = 60;
 
+  /**
+   * MAX # of files stores in ADLS Gen2
+   */
   private final int ADLS_FILE_COUNT = 60;
 
+  /**
+   * ADLS Gen2 model.json file base prefix
+   */
   private final String BASE_MODEL_PREFIX = "{\n"
       + "    \"name\": \"SystemMetricsSimulationV1\",\n"
       + "    \"description\": \"\",\n"
@@ -88,23 +101,38 @@ public class AdlsAgent extends AbstractAgent {
   int counter = 0;
 
   /**
-   * Set Timer to send to ADLS Gen2
+   * Set Swim Timer to send data to ADLS Gen2
    */
   TimerRef adlsTimer;
 
+  /**
+   * ADLS Gen2 Configuration
+   */
   @SwimLane("config")
   ValueLane<Value> config = this.<Value>valueLane();
 
+  /**
+   * ADLS Gen2 Configuration
+   */
   @SwimLane("model")
   ValueLane<String> model = this.<String>valueLane();
 
+  /**
+   * ADLS Gen2 Configuration
+   */
   @SwimLane("information")
   ValueLane<Value> information = this.<Value>valueLane();
 
+  /**
+   * History MapLane that stores publish history to ADLS Gen2
+   */
   @SwimTransient
   @SwimLane("publishHistory")
   MapLane<Integer, String> publishHistory = this.<Integer, String>mapLane();
 
+  /**
+   * History mapLane that stores data received from SimulationAgent
+   */
   @SwimTransient
   @SwimLane("dataHistory")
   MapLane<Long, Value> dataHistory = this.<Long, Value>mapLane()
@@ -116,12 +144,18 @@ public class AdlsAgent extends AbstractAgent {
         }
       });
 
+  /**
+   * CommandLane that waits to receive message from SimulationAgent
+   */
   @SwimLane("addData")
   CommandLane<Value> addData = this.<Value>commandLane()
       .onCommand(value -> {
         dataHistory.put(System.currentTimeMillis(), value);
       });
 
+  /**
+   * Timer set to send ADLS Gen2
+   */
   private void adlsTimer() {
     adlsTimer = setTimer(MAX_HISTORY_SIZE * 1000L, this::sendToADLS);
   }
@@ -134,6 +168,10 @@ public class AdlsAgent extends AbstractAgent {
     }
   }
 
+  /**
+   * Publish data to ADLS Gen2 and restart timer
+   * @throws Exception
+   */
   private void publish() throws Exception{
     final long now = System.currentTimeMillis();
     final String content = generateContent();
@@ -156,6 +194,10 @@ public class AdlsAgent extends AbstractAgent {
     adlsTimer();
   }
 
+  /**
+   * Generate file content that send to ADLS Gen2
+   * @return String of content
+   */
   private String generateContent() {
     final OrderedMap<Long, Value> data = dataHistory.snapshot();
     StringBuilder sb = new StringBuilder();
@@ -187,6 +229,9 @@ public class AdlsAgent extends AbstractAgent {
     return sb.toString();
   }
 
+  /**
+   * ADLS Gen2 Rest Client initialization
+   */
   private void initClient() {
     if (initFlag) {
       initFields();
@@ -218,6 +263,12 @@ public class AdlsAgent extends AbstractAgent {
     restClient.deleteFile(fileName);
   }
 
+  /**
+   * Update model.json file
+   * @param fileName
+   * @param now
+   * @throws Exception
+   */
   private void updateModel(String fileName, long now) throws Exception{
     if (counter >= ADLS_FILE_COUNT) {
       publishHistory.remove(counter - ADLS_FILE_COUNT);
@@ -274,6 +325,9 @@ public class AdlsAgent extends AbstractAgent {
     publishToAdls(contents, MODEL_FILE);
   }
 
+  /**
+   * Cancel timer when agent stops
+   */
   @Override
   public void willStop() {
     if (adlsTimer != null) {
@@ -282,6 +336,9 @@ public class AdlsAgent extends AbstractAgent {
     }
   }
 
+  /**
+   * First method get called with AdlsAgent starts
+   */
   @Override
   public void didStart() {
     info(Record.create(2)

@@ -1,15 +1,19 @@
 @kernel(class: 'swim.store.db.DbStoreKernel', optional: true)
 @kernel(class: 'swim.reflect.ReflectKernel', optional: true)
 
+# "iot" is space name that needs to match with line 12 in SwimPlane.java
 iot: @fabric {
   @plane(class: "swim.iot.SwimPlane")
 
   @node {
+    # nodeUri pattern without dynamic property will auto start with App running
     uri: "/simulation"
     @agent(class: "swim.iot.agent.SimulationAgent")
   }
 
   @node {
+    # nodeUri pattern with dynamic property will not run until full pattern has been specified,
+    # e.g. line 124 in SimulationAgent.java
     pattern: "/adls/:id"
     @agent(class: "swim.iot.agent.AdlsAgent")
   }
@@ -19,6 +23,7 @@ iot: @fabric {
   }
 }
 
+# App running port
 @web(port: 9005) {
   space: "traffic"
   #documentRoot: "../ui/"

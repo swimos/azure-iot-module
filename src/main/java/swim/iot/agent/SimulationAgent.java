@@ -12,6 +12,11 @@ import swim.iot.util.EnvConfig;
 import swim.recon.Recon;
 import swim.structure.Record;
 
+/**
+ * Simulation Swim Web Agent that generate CPU and Memory usage percentage
+ * Send Json structure record to Event Hub and AdlsAgent if Azure resources account
+ * have been set in EnvConfig.java
+ */
 public class SimulationAgent extends AbstractAgent {
 
   /**
@@ -20,7 +25,7 @@ public class SimulationAgent extends AbstractAgent {
   private final int MAX_HISTORY_SIZE = 100;
 
   /**
-   * Set Timer for generate random data every 15 seconds
+   * Set Timer for generate random data every second
    */
   TimerRef dataTimer;
 
@@ -36,7 +41,7 @@ public class SimulationAgent extends AbstractAgent {
   ValueLane<Double> cpuPercent = this.<Double>valueLane();
 
   /**
-   * Swim CPU Usage History MapLane
+   * Swim CPU Usage History MapLane, key is long timestamp of cpu data generated
    */
   @SwimTransient
   @SwimLane("cpuPercentHistory")
@@ -63,7 +68,7 @@ public class SimulationAgent extends AbstractAgent {
   ValueLane<Double> memPercent = this.<Double>valueLane();
 
   /**
-   * Swim Meta Mesh Memory Usage History MapLane
+   * Swim Memory Usage History MapLane, key is long timestamp of memory data generated
    */
   @SwimTransient
   @SwimLane("memPercentHistory")
@@ -83,10 +88,16 @@ public class SimulationAgent extends AbstractAgent {
   @SwimLane("memTotal")
   ValueLane<Long> memTotal = valueLane();
 
+  /**
+   * Swim Timer to trigger @method{updateSimulation} every second
+   */
   private void dataTimer() {
     dataTimer = setTimer(1000, this::updateSimulation);
   }
 
+  /**
+   * Method to simulate random CPU and Memory Percentage Usage
+   */
   private void updateSimulation() {
     DecimalFormat df = new DecimalFormat("#.#");
     double cpuUsage_random = Math.round(Math.random() * 100);
@@ -96,16 +107,21 @@ public class SimulationAgent extends AbstractAgent {
     double cpuPercent_value = cpuUsage / (double) cpuTotal.get() * 100;
     double memPercent_value = memUsage / (double) memTotal.get() * 100;
 
+    /* Set cpuPercent ValueLane with latest simulation*/
     cpuPercent.set(cpuPercent_value);
+    /* Set memPercent ValueLane with latest simulation*/
     memPercent.set(memPercent_value);
 
     long tm = System.currentTimeMillis();
+    /* Update history MapLane */
     cpuPercentHistory.put(tm, cpuPercent_value);
     memPercentHistory.put(tm, memPercent_value);
 
+    /* Restart dataTimer to count down simulator */
     dataTimer();
+    /* Send cpu and memory usage command to ADLS Agent */
     if (!EnvConfig.ADLS_ACCOUNT_NAME.isEmpty() && !EnvConfig.ADLS_ACCOUNT_KEY.isEmpty()) {
-      command("/adls" + "/" + EnvConfig.ADLS_ACCOUNT_NAME, ADLS_Lane, dataGenerator());
+      command("/adls" + "/" + EnvConfig.ADLS_ACCOUNT_NAME, ADLS_LANE, dataGenerator());
     }
   }
 
@@ -116,12 +132,19 @@ public class SimulationAgent extends AbstractAgent {
     eventHubTimer = setTimer(30000, this::sendToEventHub);
   }
 
+  /**
+   * Method to Send data to Event Hub, and reschedule timer
+   */
   private void sendToEventHub() {
     SendToEventHub.publishEvents(Recon.toString(dataGenerator()));
     info("send to event hub");
     eventHubTimer();
   }
 
+  /**
+   * Helper Method help generate Json structure data send to Azure Event Hub and AdlsAgent
+   * @return Record of edgeDeviceName, cuptPct, and memPct
+   */
   private Record dataGenerator() {
     Record record = Record.create(3)
         .slot("edgeDeviceName", EnvConfig.EDGE_DEVICE_NAME)
@@ -130,6 +153,9 @@ public class SimulationAgent extends AbstractAgent {
     return record;
   }
 
+  /**
+   * Method called when Agent stop to cancel timers
+   */
   @Override
   public void willStop() {
     if (dataTimer != null) {
@@ -142,18 +168,26 @@ public class SimulationAgent extends AbstractAgent {
     }
   }
 
+  /**
+   * didStart() method is first method get called when a Swim Web Agent starts
+   */
   @Override
   public void didStart() {
+    /* Print uri pattern of this web agent, info() is one of the log print level*/
     info(Record.create(2)
         .slot("nodeUri", nodeUri().toString())
         .slot("didStart"));
     cpuTotal.set(100L);
     memTotal.set(100L);
+    /* Swim timer to count down to send data to Azure Event Hub*/
     dataTimer();
     if (!EnvConfig.EVENT_HUB_CONNSTRING.isEmpty() && !EnvConfig.EVENT_HUB_NAME.isEmpty()) {
       eventHubTimer();
     }
   }
 
-  private static final String ADLS_Lane = "addData";
+  /**
+   * ADLS command Lane name that waiting receive command messages
+   */
+  private static final String ADLS_LANE = "addData";
 }
