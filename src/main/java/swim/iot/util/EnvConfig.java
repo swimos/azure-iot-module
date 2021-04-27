@@ -11,7 +11,7 @@ public class EnvConfig {
   /**
    * Configuration environment variable for device name
    */
-  public static final String EDGE_DEVICE_NAME = envCorrection(System.getenv("EDGE_NAME"), "localSimulator");
+  public static final String EDGE_DEVICE_NAME = envCorrection(System.getenv("EDGE_DEVICE_NAME"), "localSimulator");
 
   /**
    * Configuration environment variables for ADLS Gen2

@@ -1,1 +1,1 @@
-sudo docker run -it --env EVENT_HUB_CONNSTRING="" --env EVENT_HUB_NAME="" --env EDGE_NAME="" --env ADLS_ACCOUNT_NAME="" --env ADLS_ACCOUNT_KEY="" --env FILE_SYSTEM="" --publish 9005:9005 swimazureiot/module:1.0
+sudo docker run -it --env EVENT_HUB_CONNSTRING="" --env EVENT_HUB_NAME="" --env EDGE_DEVICE_NAME="" --env ADLS_ACCOUNT_NAME="" --env ADLS_ACCOUNT_KEY="" --env FILE_SYSTEM="" --publish 9005:9005 swimazureiot/module:1.0
