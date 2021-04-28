@@ -3,7 +3,7 @@
 A swim application that demonstrates how data can be published to to Azure Event Hub and ADLS Gen2. 
 
 
-Data Flow: The [SimulationWebAgent](https://github.com/swimos/azure-iot-module/blob/master/src/main/java/swim/iot/agent/SimulationAgent.java) generates simulated data and sends data to the [AdlsAgent](https://github.com/swimos/azure-iot-module/blob/master/src/main/java/swim/iot/agent/AdlsAgent.java). The `AdlsAgent` sends the data to EventHub and Adls Gen2
+Data Flow: The [SimulationWebAgent](https://github.com/swimos/azure-iot-module/blob/master/src/main/java/swim/iot/agent/SimulationAgent.java) generates simulated data and sends data to EventHub and the [AdlsAgent](https://github.com/swimos/azure-iot-module/blob/master/src/main/java/swim/iot/agent/AdlsAgent.java). The `AdlsAgent` sends the data to Adls Gen2
 
 
 ## Run the Application
