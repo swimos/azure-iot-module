@@ -1,37 +1,37 @@
 # Swim IoT-Module Embedded with Azure Event Hub and ADLS Gen2  
 
-Generate a Swim simulation agent to send simulated CPU and Memory usage percentage to Azure Event Hub and ADLS
-Gen2. Able to run with local run script `runLocal.sh` or container image. Demonstrated how to build a simple Swim
-Application.
+A swim application that demonstrates how data can be published to to Azure Event Hub and ADLS Gen2. 
 
-## Run
-For shell script file that not able to run, please
-```
-chmod +x <fileName>
-```
 
-### Run with local Shell Script
-Need to set up environment variables for Event Hub and ADLS Gen2 account config in `runLocal.sh` or `runLocal.bat`
-based on Operating System. File `/src/main/java/swim/iot/util/EnvConfig.java` provides detail explanations of 
-environment variables setup.
+Data Flow: The [SimulationWebAgent](https://github.com/swimos/azure-iot-module/blob/master/src/main/java/swim/iot/agent/SimulationAgent.java) generates simulated data and sends data to the [AdlsAgent](https://github.com/swimos/azure-iot-module/blob/master/src/main/java/swim/iot/agent/AdlsAgent.java). The `AdlsAgent` sends the data to EventHub and Adls Gen2
+
+
+## Run the Application
+Pre-requisites: Set up the environment variables for the Event Hub and ADLS Gen2 accounts. [EvnvConfig.java](https://github.com/swimos/azure-iot-module/blob/master/src/main/java/swim/iot/util/EnvConfig.java) describes the different environment variables required to run this application.
+
+
+### Run using a Shell Script
+For Linux/MacOS:
 
 ```
 ./runLocal.sh
+```
 
-or
 
+For Windows:
+```
 .\runLocal.bat
 ```
 
 ### Run with Docker
 
-Build Images
+Build the docker image using the following command:
 
 ```
 ./buildImage.sh
 ```
 
-run Image, need to change environment variable for Event Hub and ADLS Gen2
+Run the application using docker by exectuting the following command:
 ```
 ./runDocker.sh
 ```
